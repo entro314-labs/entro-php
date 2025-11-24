@@ -1,5 +1,6 @@
 {
     "name": "entro314labs/entro-php",
+    "version": "1.0.0",
     "description": "PHP SDK for Entrolytics - First-party growth analytics for the edge",
     "type": "library",
     "license": "MIT",
