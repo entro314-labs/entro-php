@@ -12,6 +12,10 @@
         "laravel"
     ],
     "homepage": "https://entrolytics.click",
+    "support": {
+        "issues": "https://github.com/entro314labs/entrolytics-system/issues",
+        "source": "https://github.com/entro314labs/entrolytics-system/tree/main/entro-php"
+    },
     "authors": [
         {
             "name": "Entro314 Labs",
