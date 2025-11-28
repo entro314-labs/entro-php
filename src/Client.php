@@ -29,7 +29,7 @@ class Client
 {
     private const DEFAULT_HOST = 'https://entrolytics.click';
     private const DEFAULT_TIMEOUT = 10.0;
-    private const VERSION = '1.0.0';
+    private const VERSION = '1.1.0';
 
     private string $apiKey;
     private string $host;
