@@ -48,6 +48,104 @@ $client->identify([
 ]);
 ```
 
+## Collection Endpoints
+
+Entrolytics provides three collection endpoints optimized for different use cases:
+
+### `/api/collect` - Intelligent Routing (Recommended)
+
+The default endpoint that automatically routes to the optimal storage backend based on your plan and website settings.
+
+**Features:**
+- Automatic optimization (Free/Pro → Edge, Business/Enterprise → Node.js)
+- Zero configuration required
+- Best balance of performance and features
+
+**Use when:**
+- You want automatic optimization based on your plan
+- You're using Entrolytics Cloud
+- You don't have specific latency or feature requirements
+
+### `/api/send-native` - Edge Runtime (Fastest)
+
+Direct edge endpoint for sub-50ms global latency.
+
+**Features:**
+- Sub-50ms response times globally
+- Runs on Vercel Edge Runtime
+- Upstash Redis + Neon Serverless
+- Best for high-traffic applications
+
+**Limitations:**
+- No ClickHouse export
+- Basic geo data (country-level)
+
+**Use when:**
+- Latency is critical (<50ms required)
+- You have high request volume
+- You don't need ClickHouse export
+
+### `/api/send` - Node.js Runtime (Full-Featured)
+
+Traditional Node.js endpoint with advanced capabilities.
+
+**Features:**
+- ClickHouse export support
+- MaxMind GeoIP (city-level accuracy)
+- PostgreSQL storage
+- Advanced analytics features
+
+**Latency:** 50-150ms (regional)
+
+**Use when:**
+- Self-hosted deployments without edge support
+- You need ClickHouse data export
+- You require city-level geo accuracy
+- Custom server-side analytics workflows
+
+## Configuration
+
+### Default (Intelligent Routing)
+
+```php
+<?php
+
+use Entrolytics\Client;
+
+// Uses /api/collect by default
+$client = new Client('ent_xxx');
+```
+
+### Edge Runtime Endpoint
+
+```php
+<?php
+
+use Entrolytics\Client;
+
+// Use edge endpoint for sub-50ms latency
+$client = new Client('ent_xxx', [
+    'host' => 'https://entrolytics.click',
+    'endpoint' => '/api/send-native'
+]);
+```
+
+### Node.js Runtime Endpoint
+
+```php
+<?php
+
+use Entrolytics\Client;
+
+// Use Node.js endpoint for ClickHouse export and MaxMind GeoIP
+$client = new Client('ent_xxx', [
+    'host' => 'https://entrolytics.click',
+    'endpoint' => '/api/send'
+]);
+```
+
+See the [Routing documentation](https://entrolytics.click/docs/concepts/routing) for more details.
+
 ## Laravel Integration
 
 ### Installation

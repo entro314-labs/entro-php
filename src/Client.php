@@ -221,6 +221,214 @@ class Client
         return $this->send($payload);
     }
 
+    // ========================================================================
+    // Phase 2: Web Vitals (requires entrolytics-ng)
+    // ========================================================================
+
+    /**
+     * Track a Web Vital metric.
+     * Note: This feature requires entrolytics-ng.
+     *
+     * @param array{
+     *     website_id: string,
+     *     metric: string,
+     *     value: float,
+     *     rating: string,
+     *     delta?: float,
+     *     id?: string,
+     *     navigation_type?: string,
+     *     attribution?: array<string, mixed>,
+     *     url?: string,
+     *     path?: string,
+     *     session_id?: string
+     * } $params Web Vital parameters
+     * @return bool True on success
+     * @throws EntrolyticsException
+     */
+    public function trackVital(array $params): bool
+    {
+        $websiteId = $params['website_id'] ?? null;
+        $metric = $params['metric'] ?? null;
+        $rating = $params['rating'] ?? null;
+
+        if (empty($websiteId)) {
+            throw new ValidationException('website_id is required');
+        }
+        if (empty($metric)) {
+            throw new ValidationException('metric is required (LCP, INP, CLS, TTFB, or FCP)');
+        }
+        if (empty($rating)) {
+            throw new ValidationException('rating is required (good, needs-improvement, or poor)');
+        }
+
+        $payload = [
+            'website' => $websiteId,
+            'metric' => $metric,
+            'value' => $params['value'] ?? 0,
+            'rating' => $rating,
+        ];
+
+        if (isset($params['delta'])) {
+            $payload['delta'] = $params['delta'];
+        }
+        if (!empty($params['id'])) {
+            $payload['id'] = $params['id'];
+        }
+        if (!empty($params['navigation_type'])) {
+            $payload['navigationType'] = $params['navigation_type'];
+        }
+        if (!empty($params['attribution'])) {
+            $payload['attribution'] = $params['attribution'];
+        }
+        if (!empty($params['url'])) {
+            $payload['url'] = $params['url'];
+        }
+        if (!empty($params['path'])) {
+            $payload['path'] = $params['path'];
+        }
+        if (!empty($params['session_id'])) {
+            $payload['sessionId'] = $params['session_id'];
+        }
+
+        return $this->sendToEndpoint('/api/collect/vitals', $payload);
+    }
+
+    // ========================================================================
+    // Phase 2: Form Analytics (requires entrolytics-ng)
+    // ========================================================================
+
+    /**
+     * Track a form interaction event.
+     * Note: This feature requires entrolytics-ng.
+     *
+     * @param array{
+     *     website_id: string,
+     *     event_type: string,
+     *     form_id: string,
+     *     url_path: string,
+     *     form_name?: string,
+     *     field_name?: string,
+     *     field_type?: string,
+     *     field_index?: int,
+     *     time_on_field?: int,
+     *     time_since_start?: int,
+     *     error_message?: string,
+     *     success?: bool,
+     *     session_id?: string
+     * } $params Form event parameters
+     * @return bool True on success
+     * @throws EntrolyticsException
+     */
+    public function trackFormEvent(array $params): bool
+    {
+        $websiteId = $params['website_id'] ?? null;
+        $eventType = $params['event_type'] ?? null;
+        $formId = $params['form_id'] ?? null;
+        $urlPath = $params['url_path'] ?? null;
+
+        if (empty($websiteId)) {
+            throw new ValidationException('website_id is required');
+        }
+        if (empty($eventType)) {
+            throw new ValidationException('event_type is required');
+        }
+        if (empty($formId)) {
+            throw new ValidationException('form_id is required');
+        }
+        if (empty($urlPath)) {
+            throw new ValidationException('url_path is required');
+        }
+
+        $payload = [
+            'website' => $websiteId,
+            'eventType' => $eventType,
+            'formId' => $formId,
+            'urlPath' => $urlPath,
+        ];
+
+        if (!empty($params['form_name'])) {
+            $payload['formName'] = $params['form_name'];
+        }
+        if (!empty($params['field_name'])) {
+            $payload['fieldName'] = $params['field_name'];
+        }
+        if (!empty($params['field_type'])) {
+            $payload['fieldType'] = $params['field_type'];
+        }
+        if (isset($params['field_index'])) {
+            $payload['fieldIndex'] = $params['field_index'];
+        }
+        if (isset($params['time_on_field'])) {
+            $payload['timeOnField'] = $params['time_on_field'];
+        }
+        if (isset($params['time_since_start'])) {
+            $payload['timeSinceStart'] = $params['time_since_start'];
+        }
+        if (!empty($params['error_message'])) {
+            $payload['errorMessage'] = $params['error_message'];
+        }
+        if (isset($params['success'])) {
+            $payload['success'] = $params['success'];
+        }
+        if (!empty($params['session_id'])) {
+            $payload['sessionId'] = $params['session_id'];
+        }
+
+        return $this->sendToEndpoint('/api/collect/forms', $payload);
+    }
+
+    // ========================================================================
+    // Phase 2: Deployment Tracking (requires entrolytics-ng)
+    // ========================================================================
+
+    /**
+     * Register deployment context.
+     * Note: This feature requires entrolytics-ng.
+     *
+     * @param array{
+     *     website_id: string,
+     *     deploy_id: string,
+     *     git_sha?: string,
+     *     git_branch?: string,
+     *     deploy_url?: string,
+     *     source?: string
+     * } $params Deployment parameters
+     * @return bool True on success
+     * @throws EntrolyticsException
+     */
+    public function setDeployment(array $params): bool
+    {
+        $websiteId = $params['website_id'] ?? null;
+        $deployId = $params['deploy_id'] ?? null;
+
+        if (empty($websiteId)) {
+            throw new ValidationException('website_id is required');
+        }
+        if (empty($deployId)) {
+            throw new ValidationException('deploy_id is required');
+        }
+
+        $payload = [
+            'website' => $websiteId,
+            'deployId' => $deployId,
+        ];
+
+        if (!empty($params['git_sha'])) {
+            $payload['gitSha'] = $params['git_sha'];
+        }
+        if (!empty($params['git_branch'])) {
+            $payload['gitBranch'] = $params['git_branch'];
+        }
+        if (!empty($params['deploy_url'])) {
+            $payload['deployUrl'] = $params['deploy_url'];
+        }
+        if (!empty($params['source'])) {
+            $payload['source'] = $params['source'];
+        }
+
+        return $this->sendToEndpoint("/api/websites/{$websiteId}/deployments", $payload);
+    }
+
     /**
      * Send a request to the Entrolytics API.
      *
@@ -231,8 +439,22 @@ class Client
      */
     private function send(array $payload, array $headers = []): bool
     {
+        return $this->sendToEndpoint('/api/send', $payload, $headers);
+    }
+
+    /**
+     * Send a request to a specific Entrolytics API endpoint.
+     *
+     * @param string $endpoint API endpoint path
+     * @param array<string, mixed> $payload Request payload
+     * @param array<string, string> $headers Additional headers
+     * @return bool True on success
+     * @throws EntrolyticsException
+     */
+    private function sendToEndpoint(string $endpoint, array $payload, array $headers = []): bool
+    {
         try {
-            $response = $this->http->post('/api/send', [
+            $response = $this->http->post($endpoint, [
                 'json' => $payload,
                 'headers' => $headers,
             ]);
